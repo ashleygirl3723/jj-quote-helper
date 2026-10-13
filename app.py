@@ -131,7 +131,7 @@ st.set_page_config(page_title="J&J Instant Estimate", page_icon="🏠", layout="
 st.title("🏠 J&J Home Services")
 st.caption("Answer a few questions, get an honest starting-price estimate. No surprises, ever.")
 
-for key, default in [("stage", "form"), ("messages", []), ("estimate_text", "")]:
+for key, default in [("stage", "form"), ("messages", []), ("estimate_text", ""), ("display_summary", "")]:
     if key not in st.session_state:
         st.session_state[key] = default
 
@@ -179,6 +179,12 @@ if st.session_state.stage == "form":
                 f"COMPUTED ESTIMATE: {money(total)}\n"
             )
         estimate_facts += f"CUSTOMER NOTES: {notes.strip() or '(none)'}\n"
+        if size == "5+ bed or large home":
+            summary = f"🏠 House cleaning — {size}, {clean_type} clean, {frequency}. This one needs a free quote — call or text {PHONE}."
+        else:
+            addon_text = f" Add-ons: {', '.join(addons)}." if addons else ""
+            summary = (f"🏠 House cleaning — {size}, {clean_type} clean, {frequency}.{addon_text} "
+                       f"My estimate: **{money(total)}**.")
 
     elif service == "Yard work":
         task = st.selectbox("What does the yard need?",
@@ -197,6 +203,13 @@ if st.session_state.stage == "form":
             estimate_facts += "TASK: debris/junk haul-off — FREE QUOTE NEEDED (priced by load size; call/text a photo).\n"
         notes = st.text_area("Anything we should know?", height=70, placeholder="Gate access, steep slope, overgrown areas…")
         estimate_facts += f"CUSTOMER NOTES: {notes.strip() or '(none)'}\n"
+        if task == "Lawn mowing":
+            from_text = "from " if "from" in yard_size else ""
+            summary = f"🌿 Yard work — mowing, {yard_size}. My estimate: **{from_text}{money(price)} per visit**."
+        elif task.startswith("Cleanup"):
+            summary = f"🌿 Yard work — cleanup/weeding/trimming, about {hours} hour(s). My estimate: **{money(hours * YARD_HOURLY)}**."
+        else:
+            summary = f"🌿 Yard work — debris/junk haul-off. This one needs a free quote — call or text {PHONE}."
 
     else:  # Appliance repair
         appliance = st.selectbox("Which appliance?", list(APPLIANCE_RANGES.keys()))
@@ -208,12 +221,17 @@ if st.session_state.stage == "form":
             f"DIAGNOSTIC: {money(DIAGNOSTIC_FEE)} visit, credited toward the repair\n"
             f"TYPICAL TOTAL REPAIR RANGE: {money(low)}–{money(high)} (parts + labor)\n"
         )
+        symptom_text = symptom.strip() or "not described"
+        summary = (f"🔧 Appliance repair — {appliance} ({symptom_text}). "
+                   f"Diagnostic **{money(DIAGNOSTIC_FEE)}** (credited toward repair); "
+                   f"typical total **{money(low)}–{money(high)}**.")
 
     if st.button("Get my estimate", type="primary", use_container_width=True):
         if not api_key:
             st.error("Add your OpenRouter API key in the sidebar first — the app can't think without one. (Free at openrouter.ai/keys, no credit card.)")
         else:
             st.session_state.messages = [{"role": "user", "content": estimate_facts}]
+            st.session_state.display_summary = summary
             try:
                 with st.spinner("Writing up your estimate…"):
                     answer = generate_estimate()
@@ -232,11 +250,15 @@ else:
         st.session_state.stage = "form"
         st.session_state.messages = []
         st.session_state.estimate_text = ""
+        st.session_state.display_summary = ""
         st.rerun()
 
-    for m in st.session_state.messages:
+    for idx, m in enumerate(st.session_state.messages):
         with st.chat_message(m["role"]):
-            st.markdown(m["content"])
+            if idx == 0 and m["role"] == "user" and st.session_state.display_summary:
+                st.markdown(st.session_state.display_summary)
+            else:
+                st.markdown(m["content"])
 
     followup = st.chat_input("Ask about the estimate, what's included, scheduling…")
     if followup:
