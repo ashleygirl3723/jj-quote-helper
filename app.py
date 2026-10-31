@@ -66,6 +66,37 @@ APPLIANCE_RANGES = {
 }
 DIAGNOSTIC_FEE = 50  # credited toward the repair if they go ahead
 
+# Facility room light cleaning (approved Oct 30, 2026; see PRICE_KNOWLEDGE).
+# Light clean only: dust/wipe surfaces, sweep/vacuum/mop floors, empty trash,
+# tidy. Room with a bathroom also includes sink/toilet/mirror wipe.
+# NOT deep: no baseboards, inside appliances, cabinets, or heavy buildup.
+FACILITY_ROOM_RATES = {
+    "Room without bathroom": 35,
+    "Room with bathroom": 50,
+    "Bathroom only": 30,
+}
+FACILITY_HOURLY = 25  # same as the house-cleaning hourly rate on the sheet
+FACILITY_HOURLY_MIN = 2  # hours
+FACILITY_TYPES = [
+    "Care facility / assisted living",
+    "Office",
+    "Clinic / medical office",
+    "Retail / store",
+    "Other business",
+]
+# Categories a business picks from in the "Services needed" dropdown.
+# These define scope; price still comes from the room counts / hours below,
+# so no new per-category rate is invented here.
+FACILITY_SERVICE_CATEGORIES = [
+    "Resident / guest rooms",
+    "Bathrooms",
+    "Common areas & hallways",
+    "Offices",
+    "Break room / kitchen",
+    "Lobby / reception",
+]
+FACILITY_COMMON_AREA_RATE = 35  # same as a room without a bathroom
+
 PRICE_KNOWLEDGE = """J&J HOME SERVICES — PRICE SHEET (effective October 2026, Lebanon & Sweet Home, OR).
 Starting prices for typical jobs. Firm quote always confirmed before work begins. No repair ever starts without approval.
 
@@ -84,6 +115,14 @@ YARD WORK — mow, trim, edge, and blow-off included in every mowing visit:
 - Small yard mowing: $40/visit; medium: $45/visit; large: from $55/visit
 - Cleanup, weeding, hedge trimming, leaf cleanup: $45/hr (or flat quote for big jobs)
 - Debris & junk haul-off: priced by load, free quote
+
+FACILITY ROOM LIGHT CLEANING:
+- Business picks a facility category (care facility, office, clinic, retail, other) and services needed from a dropdown: resident/guest rooms, bathrooms, common areas & hallways, offices, break room/kitchen, lobby/reception
+- By the job (per room/space): room without bathroom $35, room with bathroom $50, bathroom only $30, common area/office $35
+- By the hour: $25/hr, 2-hour minimum (same hourly rate as house cleaning)
+- Light clean only: dust/wipe surfaces, sweep/vacuum/mop floors, empty trash, tidy; rooms with a bathroom also get sink/toilet/mirror wiped
+- NOT included: baseboards, inside appliances, cabinets, heavy buildup — those are a deep clean / free quote
+- Recurring facility work: free quote for a standing rate
 
 APPLIANCE REPAIR — washers, dryers, dishwashers:
 - Diagnostic visit: $50, credited toward the repair if they go ahead
@@ -150,7 +189,7 @@ def generate_estimate():
 # Estimate form
 # ---------------------------------------------------------------------------
 if st.session_state.stage == "form":
-    service = st.selectbox("What do you need?", ["House cleaning", "Yard work", "Appliance repair"])
+    service = st.selectbox("What do you need?", ["House cleaning", "Yard work", "Appliance repair", "Facility room light cleaning"])
 
     estimate_facts = f"SERVICE: {service}\n"
 
@@ -210,6 +249,60 @@ if st.session_state.stage == "form":
             summary = f"🌿 Yard work — cleanup/weeding/trimming, about {hours} hour(s). My estimate: **{money(hours * YARD_HOURLY)}**."
         else:
             summary = f"🌿 Yard work — debris/junk haul-off. This one needs a free quote — call or text {PHONE}."
+
+    elif service == "Facility room light cleaning":
+        st.caption("Light clean only: dust/wipe surfaces, floors, trash, tidy. Rooms with a bathroom also get sink/toilet/mirror wiped. No baseboards, inside appliances, or heavy buildup.")
+        # Categories first, so a business picks what it needs before pricing.
+        facility_type = st.selectbox("What kind of business / facility?", FACILITY_TYPES)
+        services_needed = st.multiselect("Services needed — pick all that apply",
+                                         FACILITY_SERVICE_CATEGORIES,
+                                         default=["Resident / guest rooms"])
+        estimate_facts += (
+            f"FACILITY CATEGORY: {facility_type}\n"
+            f"SERVICES NEEDED: {', '.join(services_needed) if services_needed else '(none picked yet)'}\n"
+        )
+        pricing_mode = st.radio("Price it how?", ["By the job (per room)", "By the hour"], horizontal=True)
+        if pricing_mode == "By the job (per room)":
+            rooms_no_bath = st.number_input("Rooms without a bathroom", min_value=0, max_value=100, value=1, step=1)
+            rooms_with_bath = st.number_input("Rooms with a bathroom", min_value=0, max_value=100, value=0, step=1)
+            baths_only = st.number_input("Bathrooms only", min_value=0, max_value=100, value=0, step=1)
+            common_areas = st.number_input("Common areas / offices", min_value=0, max_value=100, value=0, step=1)
+            total = (rooms_no_bath * FACILITY_ROOM_RATES["Room without bathroom"]
+                     + rooms_with_bath * FACILITY_ROOM_RATES["Room with bathroom"]
+                     + baths_only * FACILITY_ROOM_RATES["Bathroom only"]
+                     + common_areas * FACILITY_COMMON_AREA_RATE)
+            estimate_facts += (
+                f"PRICING: by the job (per room/space)\n"
+                f"ROOMS WITHOUT BATHROOM: {rooms_no_bath} x {money(FACILITY_ROOM_RATES['Room without bathroom'])}\n"
+                f"ROOMS WITH BATHROOM: {rooms_with_bath} x {money(FACILITY_ROOM_RATES['Room with bathroom'])}\n"
+                f"BATHROOMS ONLY: {baths_only} x {money(FACILITY_ROOM_RATES['Bathroom only'])}\n"
+                f"COMMON AREAS / OFFICES: {common_areas} x {money(FACILITY_COMMON_AREA_RATE)}\n"
+                f"COMPUTED ESTIMATE: {money(total)}\n"
+            )
+            services_text = f" Services: {', '.join(services_needed)}." if services_needed else ""
+            summary = (f"🏢 Facility light cleaning ({facility_type}) — by the job: {rooms_no_bath} room(s) without bathroom, "
+                       f"{rooms_with_bath} with bathroom, {baths_only} bathroom(s) only, {common_areas} common area(s)/office(s).{services_text} "
+                       f"My estimate: **{money(total)}**.")
+            if total == 0:
+                summary = f"🏢 Facility light cleaning ({facility_type}) — by the job: pick at least one room or space to get an estimate."
+            if not services_needed:
+                summary = f"🏢 Facility light cleaning ({facility_type}) — pick at least one service needed first."
+        else:
+            hours = st.number_input("About how many hours of work?", min_value=FACILITY_HOURLY_MIN, max_value=40, value=FACILITY_HOURLY_MIN, step=1)
+            total = hours * FACILITY_HOURLY
+            estimate_facts += (
+                f"PRICING: by the hour\nHOURS: ~{hours} at {money(FACILITY_HOURLY)}/hr "
+                f"({FACILITY_HOURLY_MIN}-hour minimum)\n"
+                f"COMPUTED ESTIMATE: {money(total)}\n"
+            )
+            services_text = f" Services: {', '.join(services_needed)}." if services_needed else ""
+            summary = (f"🏢 Facility light cleaning ({facility_type}) — by the hour: about {hours} hour(s) at "
+                       f"{money(FACILITY_HOURLY)}/hr.{services_text} My estimate: **{money(total)}**.")
+            if not services_needed:
+                summary = f"🏢 Facility light cleaning ({facility_type}) — pick at least one service needed first."
+        notes = st.text_area("Anything we should know?", height=70,
+                             placeholder="Occupied rooms, access hours, who supplies products, recurring schedule…")
+        estimate_facts += f"CUSTOMER NOTES: {notes.strip() or '(none)'}\n"
 
     else:  # Appliance repair
         appliance = st.selectbox("Which appliance?", list(APPLIANCE_RANGES.keys()))

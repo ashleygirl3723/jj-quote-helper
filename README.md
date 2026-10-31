@@ -19,6 +19,13 @@ actually pay for. This one is for a real business.
 - **Appliance repair** — $50 diagnostic (credited toward repair) plus the
   honest typical range, with the "if fixing costs more than half of new,
   we'll tell you" rule
+- **Facility room light cleaning** — a business
+  first picks a facility category (care facility, office, clinic, retail,
+  other) and services needed from a dropdown (rooms, bathrooms, common
+  areas & hallways, offices, break room/kitchen, lobby/reception), then
+  prices by the job per room/space ($35 without bathroom, $50 with
+  bathroom, $30 bathroom only, $35 common area/office) or by the hour
+  ($25/hr, 2-hour minimum)
 
 The pricing math is **deterministic Python from the price sheet**, so the AI
 can never misquote a number. The open-weight model only writes the friendly
