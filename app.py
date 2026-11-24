@@ -34,14 +34,14 @@ PHONE = "(408) 823-8144"
 SERVICE_AREA = "Lebanon, Sweet Home, and nearby communities"
 
 # ---------------------------------------------------------------------------
-# Price sheet (J&J Home Services, effective October 2026).
+# Price sheet (J&J Home Services, effective November 2026).
 # Starting prices for typical jobs; firm quote confirmed before work.
 # ---------------------------------------------------------------------------
 CLEANING_BASE = {
-    "Studio / 1 bed, 1 bath": {"standard": 120, "deep": 180},
-    "2 bed, 1–2 bath": {"standard": 150, "deep": 225},
-    "3 bed, 2 bath": {"standard": 185, "deep": 275},
-    "4 bed, 2–3 bath": {"standard": 230, "deep": 345},
+    "Studio / 1 bed, 1 bath": {"standard": 135, "deep": 200},
+    "2 bed, 1–2 bath": {"standard": 175, "deep": 260},
+    "3 bed, 2 bath": {"standard": 215, "deep": 320},
+    "4 bed, 2–3 bath": {"standard": 270, "deep": 400},
 }
 CLEANING_ADDONS = {
     "Extra bedroom": 25,
@@ -53,29 +53,29 @@ CLEANING_ADDONS = {
 CLEANING_FREQUENCY_DISCOUNT = {"One-time": 0.0, "Every 2 weeks": 0.10, "Weekly": 0.15}
 
 YARD_MOWING = {
-    "Small yard — up to about 5,000 sq ft of lawn": 40,
-    "Medium yard — most in-town homes": 45,
-    "Large yard — corner lots, acreage edges (from)": 55,
+    "Small yard — up to about 5,000 sq ft of lawn": 45,
+    "Medium yard — most in-town homes": 55,
+    "Large yard — corner lots, acreage edges (from)": 65,
 }
-YARD_HOURLY = 45  # cleanup, weeding, hedge trimming, leaf cleanup
+YARD_HOURLY = 50  # cleanup, weeding, hedge trimming, leaf cleanup
 
 APPLIANCE_RANGES = {
-    "Washer": (150, 350),
-    "Dryer": (150, 300),
-    "Dishwasher": (100, 300),
+    "Washer": (175, 400),
+    "Dryer": (175, 350),
+    "Dishwasher": (125, 350),
 }
-DIAGNOSTIC_FEE = 50  # credited toward the repair if they go ahead
+DIAGNOSTIC_FEE = 75  # credited toward the repair if they go ahead
 
 # Facility room light cleaning (approved Oct 30, 2026; see PRICE_KNOWLEDGE).
 # Light clean only: dust/wipe surfaces, sweep/vacuum/mop floors, empty trash,
 # tidy. Room with a bathroom also includes sink/toilet/mirror wipe.
 # NOT deep: no baseboards, inside appliances, cabinets, or heavy buildup.
 FACILITY_ROOM_RATES = {
-    "Room without bathroom": 35,
-    "Room with bathroom": 50,
-    "Bathroom only": 30,
+    "Room without bathroom": 40,
+    "Room with bathroom": 55,
+    "Bathroom only": 35,
 }
-FACILITY_HOURLY = 25  # same as the house-cleaning hourly rate on the sheet
+FACILITY_HOURLY = 30  # facility hourly rate (raised Nov 23, 2026); house-cleaning hourly is $30
 FACILITY_HOURLY_MIN = 2  # hours
 FACILITY_TYPES = [
     "Care facility / assisted living",
@@ -95,38 +95,38 @@ FACILITY_SERVICE_CATEGORIES = [
     "Break room / kitchen",
     "Lobby / reception",
 ]
-FACILITY_COMMON_AREA_RATE = 35  # same as a room without a bathroom
+FACILITY_COMMON_AREA_RATE = 40  # same as a room without a bathroom
 
-PRICE_KNOWLEDGE = """J&J HOME SERVICES — PRICE SHEET (effective October 2026, Lebanon & Sweet Home, OR).
+PRICE_KNOWLEDGE = """J&J HOME SERVICES — PRICE SHEET (effective November 2026, Lebanon & Sweet Home, OR).
 Starting prices for typical jobs. Firm quote always confirmed before work begins. No repair ever starts without approval.
 
 HOUSE CLEANING — flat rate by home size:
-- Studio / 1 bed, 1 bath: standard $120, deep $180
-- 2 bed, 1–2 bath: standard $150, deep $225
-- 3 bed, 2 bath: standard $185, deep $275
-- 4 bed, 2–3 bath: standard $230, deep $345
+- Studio / 1 bed, 1 bath: standard $135, deep $200
+- 2 bed, 1–2 bath: standard $175, deep $260
+- 3 bed, 2 bath: standard $215, deep $320
+- 4 bed, 2–3 bath: standard $270, deep $400
 - 5+ bed or large home: free quote
 Standard clean: kitchens, bathrooms, floors, dusting, mirrors, trash.
 Deep clean: everything above plus baseboards, inside appliances, cabinets, built-up grime. Best for first visits, move-ins, move-outs (move-in/out priced as deep clean).
 Add-ons: extra bedroom +$25, extra bathroom +$20, inside fridge $25, inside oven $25, interior windows $40.
-Regular cleanings: weekly 15% off, every 2 weeks 10% off. Prefer hourly? $25/hr, 2-hour minimum.
+Regular cleanings: weekly 15% off, every 2 weeks 10% off. Prefer hourly? $30/hr, 2-hour minimum.
 
 YARD WORK — mow, trim, edge, and blow-off included in every mowing visit:
-- Small yard mowing: $40/visit; medium: $45/visit; large: from $55/visit
-- Cleanup, weeding, hedge trimming, leaf cleanup: $45/hr (or flat quote for big jobs)
+- Small yard mowing: $45/visit; medium: $55/visit; large: from $65/visit
+- Cleanup, weeding, hedge trimming, leaf cleanup: $50/hr (or flat quote for big jobs)
 - Debris & junk haul-off: priced by load, free quote
 
 FACILITY ROOM LIGHT CLEANING:
 - Business picks a facility category (care facility, office, clinic, retail, other) and services needed from a dropdown: resident/guest rooms, bathrooms, common areas & hallways, offices, break room/kitchen, lobby/reception
-- By the job (per room/space): room without bathroom $35, room with bathroom $50, bathroom only $30, common area/office $35
-- By the hour: $25/hr, 2-hour minimum (same hourly rate as house cleaning)
+- By the job (per room/space): room without bathroom $40, room with bathroom $55, bathroom only $35, common area/office $40
+- By the hour: $30/hr, 2-hour minimum
 - Light clean only: dust/wipe surfaces, sweep/vacuum/mop floors, empty trash, tidy; rooms with a bathroom also get sink/toilet/mirror wiped
 - NOT included: baseboards, inside appliances, cabinets, heavy buildup — those are a deep clean / free quote
 - Recurring facility work: free quote for a standing rate
 
 APPLIANCE REPAIR — washers, dryers, dishwashers:
-- Diagnostic visit: $50, credited toward the repair if they go ahead
-- Washer typical total: $150–$350. Dryer: $150–$300. Dishwasher: $100–$300
+- Diagnostic visit: $75, credited toward the repair if they go ahead
+- Washer typical total: $175–$400. Dryer: $175–$350. Dishwasher: $125–$350
 - Ranges cover most common repairs, parts and labor combined
 - If a fix would cost more than half the price of a new appliance, say so honestly and help them weigh replacing it
 
@@ -143,7 +143,7 @@ Hard rules:
 1. NEVER invent a price. Use only the prices in the PRICE SHEET below and the estimate details provided. If the customer asks about something not on the sheet, say it's a free quote and tell them to call or text a photo of the job.
 2. Every estimate is a STARTING price for a typical job. Always include the line: "Final quote confirmed before any work begins."
 3. Be honest about uncertainty: heavy buildup, very large yards, or tricky repairs may cost more — say so upfront.
-4. For appliance repair, always mention the $50 diagnostic (credited toward the repair) and the honest rule: if fixing costs more than half of new, you'll say so.
+4. For appliance repair, always mention the $75 diagnostic (credited toward the repair) and the honest rule: if fixing costs more than half of new, you'll say so.
 5. No hype, no pressure. Plain language, short paragraphs. End every quote message with: "Want to book? Call or text (408) 823-8144."
 6. Keep answers brief. This is a quote tool, not a chat room.
 
@@ -236,7 +236,7 @@ if st.session_state.stage == "form":
             estimate_facts += f"TASK: mowing — {yard_size}\nCOMPUTED ESTIMATE: {prefix}{money(price)} per visit (mow, trim, edge, blow-off included)\n"
         elif task.startswith("Cleanup"):
             hours = st.number_input("About how many hours of work?", min_value=1, max_value=16, value=2, step=1)
-            estimate_facts += (f"TASK: cleanup/weeding/hedge/leaf work\nHOURS: ~{hours} at $45/hr\n"
+            estimate_facts += (f"TASK: cleanup/weeding/hedge/leaf work\nHOURS: ~{hours} at $50/hr\n"
                                f"COMPUTED ESTIMATE: {money(hours * YARD_HOURLY)} (flat quote possible for big jobs)\n")
         else:
             estimate_facts += "TASK: debris/junk haul-off — FREE QUOTE NEEDED (priced by load size; call/text a photo).\n"
